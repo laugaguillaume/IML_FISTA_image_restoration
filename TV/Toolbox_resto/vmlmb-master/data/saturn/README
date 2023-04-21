@@ -1,0 +1,5 @@
+This directory contains sample HST data of Saturn, including an observed
+point spread function.
+
+saturn.fits		HST Wide Field Camera image, 512 x 512, bitpix = 16
+saturn_psf.fits		PSF for Saturn image, 53 x 53, bitpix = 16

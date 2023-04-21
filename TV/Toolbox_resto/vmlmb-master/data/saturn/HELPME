@@ -1,0 +1,18 @@
+A brief summary of the installation process for TABLES/STSDAS is outlined in 
+the file INSTALL from STScI's anonymous ftp site:
+	
+	ftp.stsci.edu/pub/software/stsdas/INSTALL 
+
+If you have any questions or problems while installing TABLES or STSDAS, or
+if you are compiling the binaries from scratch, please refer to the 
+"STSDAS Manager's Site Guide and Installation Reference" available as a 
+postscript file from STScI's anonymous ftp site:
+
+	ftp.stsci.edu/pub/software/stsdas/docs
+
+Help is also available from the STScI Help Desk, e-mail help@stsci.edu,
+telephone (410)338-1082.  When sending e-mail please include in your message:
+
+	1) The Operating System and Architecture of your computer
+	2) The version of IRAF you have installed 
+	3) The version of TABLES/STSDAS you are installing. 
