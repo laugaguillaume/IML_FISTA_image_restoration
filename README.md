@@ -8,7 +8,7 @@
  Inpainting with 50 % missing pixels \
  Inpainting with 90 % missing pixels \
  Small gaussian blur \
- High gaussian blur \
+ High gaussian blur 
  
  # Images possible
  JWST deep field in sizes 256 x 256 x 3 to 2048 x 2048 x 3 + gray version in 256 x 256
