@@ -5,21 +5,20 @@ addpath(genpath('TV'))
 addpath(genpath('Functions'))
 addpath InfoTransfer/
 addpath Proximity_operators/
-%addpath('/Applications/MATLAB_R2021b.app/toolbox/Wavelab850')
-%WavePath;
 %%
 image_choice = 'JWST 256 gray';  % Image choice
-param.std    = 1e-2;           % Variance du bruit
+param.std    = 1e-2;           % Gaussian noise variance
 choice_blur  = 'Inpainting 50';  
 snr = [0]
 %%
 [X,param,Ar,Ac,A1,A2,A3]   = create_data(image_choice,choice_blur,param);
 [param.N,param.M,channel] = size(X);
-TAU = 1; %STEP 
+TAU = 1; %STEP_SIZE
 % TOTAL VARIATION %
 param_reg.norm_type = {'L2reg'};  % options: 'nuclearreg'
 param_reg.reg = {'L1'}; %L1, nuclear
 param_reg.TVtype= 'TV';
+
 %%
 param.lambda = 5e-3;
 p = 2;
@@ -40,15 +39,7 @@ for level=param.nb_level:-1:1
     level_number = matlab.lang.makeValidName(['maxit_level' num2str(level)]);
     param.(level_number) = param.iterations_number(param.nb_level-level+1);
 end
-mgm =param.nb_level;
-% Penalization term
-param_reg.nltv_eta  = param.lambda;
-param_reg.neigh_rad = 2;
-param_reg.blk_rad   = 2;
-param_reg.delta     = 35;
-param_reg.iter      = 2e2;
-param_reg.epsilon   = param.epsilon;
-param.reg_type = [param_reg.reg,'_',param_reg.TVtype];
+% Creation of TV/NLTV operators
 if strcmpi(param_reg.TVtype, 'NLTV')
     x_ref = mean(param.Z,3);
     w = get_fov_weights(x_ref, param_reg.delta, param_reg.blk_rad, param_reg.neigh_rad);
@@ -56,13 +47,21 @@ if strcmpi(param_reg.TVtype, 'NLTV')
 elseif strcmpi(param_reg.TVtype, 'TV')
     D_op = get_tv;
 end
+% Config regularization proximity operator estimation for optimization
+param_reg.nltv_eta  = param.lambda;
+param_reg.neigh_rad = 2;
+param_reg.blk_rad   = 2;
+param_reg.delta     = 35;
+param_reg.iter      = 2e2;
+param_reg.epsilon   = param.epsilon;
+param.reg_type = [param_reg.reg,'_',param_reg.TVtype];
 prox = get_prox(param_reg.norm_type);
 param.dir_op       = @(x) D_op.dir_op(x);
 param.adj_op      = @(x) D_op.adj_op(x);
 param.functions.gh = @(U) param.lambda.*penalisation_cost(D_op.dir_op(U),param_reg.reg);%tlv(U,param.tlv_choice);
 param.proximal.proxgh = @(U,GAMMA,param_reg) denoising(U,param.lambda*GAMMA,D_op,prox,param_reg);
 param.proximal.proxg = @(U,GAMMA) prox(U,param.lambda.*GAMMA);
-% Config blur for optimization
+% Config degradation functions/gradient of data fidelity term for optimization
 switch choice_blur    
     case 'Gauss small'
         param.functions.fh = @(U) blur_L2_color_function(U,param.Z,Ac,Ar,Acolor); 
@@ -124,12 +123,8 @@ load(filename) %load Ac Ar D_op
 max_it_coarse        = 5;            % Nb max d'itération au niveau grossier
 param.moreau          = 1.1;           % Paramètre de moreau
 param.p               = 2;             % Nb de fois où l'on va à l'itération grossière
-starting_iterate     = 'Wiener filter';              % Initialisation algo     
-bk_coarse            = 0; bk_fine              = 'No';           % Backtracking niveau grossier     
-param.F_star         = 1e-10;      % Critère d'arrêt
-param.epsilon        = 1e-8;
 param.nb_level       = 5;
-param.d		     = 1;
+param.d		     = 1; % relaxation parameter
 param.iterations_number   = [max_iteration_number,5,5,5,5,5,5,5]; % Number of iterations per level in descending order 
 
 % Construction of struct containing each level iterations number
@@ -139,14 +134,7 @@ for level=param.nb_level:-1:1
 end
 % Penalization term
 TAU = 1;
-% TOTAL VARIATION %
-param_reg.nltv_eta  = param.lambda;
-param_reg.neigh_rad = 2;
-param_reg.blk_rad   = 2;
-param_reg.delta     = 35;
-param_reg.iter      = 2e2;
-param_reg.epsilon   = param.epsilon;
-param.reg_type = [param_reg.reg,'_',param_reg.TVtype];
+% Proximity operator %
 prox = get_prox(param_reg.norm_type);
 param.dir_op       = @(x) D_op.dir_op(x);
 param.adj_op      = @(x) D_op.adj_op(x);
