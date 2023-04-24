@@ -5,6 +5,7 @@ addpath(genpath('TV'))
 addpath(genpath('Functions'))
 addpath InfoTransfer/
 addpath Proximity_operators/
+addpath Images/
 %%
 image_choice = 'JWST 256 gray';  % Image choice
 param.std    = 1e-2;           % Gaussian noise variance
