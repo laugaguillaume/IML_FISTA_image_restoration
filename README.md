@@ -2,8 +2,9 @@
 ## Matlab code to run IML FISTA
  Run demo_IMLFISTA.m to compare FISTA and IML FISTA on the same optimization problem \
  Be careful of the image chosen as CPU time increases rapidly with dimension
- ## Important note :
- To function, the code uses a Matlab toolbox to compute proximity operators of TV based norms written by Giovanni Chierchia [prox-repository](http://proximity-operator.net). \
+ ## Read before running the code:
+ To function, the code uses a Matlab toolbox to define proximity operators of TV based norms written by Giovanni Chierchia [prox-repository](http://proximity-operator.net). \
+ The blur operators are constructed using the HNO package which is available here : [HNO](http://www.imm.dtu.dk/~pcha/HNO/). The HNO folder contains every function of this package. \
  The information transfers are based on wavelet transforms and thus a function of the [Wavelab850](https://statweb.stanford.edu/~wavelab/) toolbox is included here. 
  # Problems possible
  see create_data.m \
