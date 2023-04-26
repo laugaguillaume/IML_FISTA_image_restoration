@@ -7,33 +7,30 @@ addpath InfoTransfer/
 addpath Proximity_operators/
 addpath Images/
 addpath HNO/
-%%
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CREATING DATA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 image_choice = 'JWST 256 gray';  % Image choice
 param.std    = 1e-2;           % Gaussian noise variance
 choice_blur  = 'Gauss small';  
 snr = [0]
-%%
 [X,param,Ar,Ac,A1,A2,A3,Acolor]   = create_data(image_choice,choice_blur,param);
 [param.N,param.M,channel] = size(X);
 TAU = 1; %STEP_SIZE
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% REGULARIZATION CHOICE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % TOTAL VARIATION %
 param_reg.norm_type = {'L2reg'};  % options: 'nuclearreg'
 param_reg.reg = {'L1'}; %L1, nuclear
 param_reg.TVtype= 'TV';
-
-%%
 param.lambda = 5e-3;
-p = 2;
-%%
-% Algo
-max_iteration_number = 3;    % Nb max d'itération au niveau fin  
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ALGORITHM PARAMETERS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+max_iteration_number = 3;                     % Nb max d'itération au niveau fin  
+p = 2;                                        % Number of coarse corrections 
 param.p = p;
-param.starting_iterate     = 'Wiener filter';              % Initialisation algo     
-bk_coarse            = 0;                     % Backtracking niveau grossier     
-bk_fine              = 'No';       % Avec ou sans backtracking
-param.epsilon        = 1e-8;
-param.nb_level       = 1;
-param.d		     = 1;
+param.starting_iterate = 'Wiener filter';     % Initialisation 
+bk_coarse            = 0;                     % Backtracking (coarse level)
+bk_fine              = 'No';                  % Backtracking (fine level)
+param.epsilon        = 1e-8;                  % Starting accuracy of the proximity operator
+param.nb_level       = 1;                     % number of levels 1 because FISTA
+param.d		     = 1;                         % Relaxation parameter (see Aujo, Dossal 2015)
 param.iterations_number   = [max_iteration_number]; % Number of iterations per level in descending order 
 
 % Construction of struct containing each level iterations number
@@ -106,6 +103,7 @@ end
 f_1f = Fun_1f(1,:); g_1f = Fun_1f(2,:);
 finale_1f = f_1f(end) + g_1f(end);
 temps_1f = time_steps_1f(end);
+%% Save variables
 filename = [image_choice,'_',choice_blur,'_',num2str(param.std),'_',param_reg.reg{1},param_reg.TVtype,'_',num2str(param.lambda),'_',num2str(TAU)];
 Z = param.Z;
 k = 0
@@ -117,25 +115,22 @@ snr = [snr, snr1];
 filename = [filename,num2str(k),'.mat'];
 save(filename,'Z','Ar','Ac','A1','A2','A3','D_op','X0','xk_1f','x_iterations_1f','Fun_1f','time_steps_1f','finale_1f','temps_1f','snr1');
 
-%% IML FISTA
-
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% IML FISTA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 load(filename) %load Ac Ar D_op
 %%
 % Algo   % Nb max d'itération au niveau fin
-max_it_coarse        = 5;            % Nb max d'itération au niveau grossier
-param.moreau          = 1.1;           % Paramètre de moreau
-param.p               = 2;             % Nb de fois où l'on va à l'itération grossière
-param.nb_level       = 5;
-param.d		     = 1; % relaxation parameter
-param.iterations_number   = [max_iteration_number,5,5,5,5,5,5,5]; % Number of iterations per level in descending order 
+max_it_coarse        = 5;            % Max iteration number at coarse level
+param.moreau          = 1.1;         % Smoothing parameter
+param.nb_level       = 5;            % Number of levels 
+param.iterations_number   = [max_iteration_number,max_it_coarse,...
+    max_it_coarse,max_it_coarse,max_it_coarse,max_it_coarse,max_it_coarse,max_it_coarse]; % Number of iterations per level in descending order 
 
 % Construction of struct containing each level iterations number
 for level=param.nb_level:-1:1
     level_number = matlab.lang.makeValidName(['maxit_level' num2str(level)]);
     param.(level_number) = param.iterations_number(param.nb_level-level+1);
 end
-% Penalization term
-TAU = 1;
+
 % Proximity operator %
 prox = get_prox(param_reg.norm_type);
 param.dir_op       = @(x) D_op.dir_op(x);
@@ -163,8 +158,10 @@ end
 param.wavelet_choice = 'Symmlet';
 param.v_m = 10; param.TypeBorder = 'periodic' ;
 param.qmfphi  = MakeONFilter(param.wavelet_choice,param.v_m);
+
 levelAlpha = matlab.lang.makeValidName(['level' num2str(param.nb_level) 'alpha']);
 param.(levelAlpha) = TAU;
+%% DEFINITION OF COARSE LEVEL FUNCTIONS
 Ac_H = Ac; Ar_H = Ar; ZH = Z; A1_H = A1; A2_H = A2; A3_H = A3;
 param.alpha_moreau = 1/(1+param.moreau*param.lambda);
 lambda_reg = param.lambda;
@@ -245,11 +242,11 @@ end
 filename_IML = [filename_IML,num2str(k),'.mat'];
 save(filename_IML,'xk','x_iterations','Fun','time_steps','snr_steps');
 
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOT RESULTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 load(filename,'Fun_1f','time_steps_1f','Z','finale_1f','xk_1f','x_iterations_1f')
 load(filename_IML,'Fun','time_steps','xk','x_iterations','snr_steps')
 %% NORMALIZE FUNCTION VALUES
-N = max_iteration_number
+N = max_iteration_number 
 F = sum(Fun,1);
 F_normalized = (F(1:N+1))./F(1);
 F_1f = sum(Fun_1f,1); F_1f = F_1f(1:N+1);
