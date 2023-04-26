@@ -1,4 +1,4 @@
-function [X,param,Ar,Ac,A1,A2,A3] = create_data(choice_image,choice_blur,param)
+function [X,param,Ar,Ac,A1,A2,A3,Acolor] = create_data(choice_image,choice_blur,param)
 
 switch choice_image
     case 'JWST 256 gray'

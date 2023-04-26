@@ -6,13 +6,14 @@ addpath(genpath('Functions'))
 addpath InfoTransfer/
 addpath Proximity_operators/
 addpath Images/
+addpath HNO/
 %%
 image_choice = 'JWST 256 gray';  % Image choice
 param.std    = 1e-2;           % Gaussian noise variance
-choice_blur  = 'Inpainting 50';  
+choice_blur  = 'Gauss small';  
 snr = [0]
 %%
-[X,param,Ar,Ac,A1,A2,A3]   = create_data(image_choice,choice_blur,param);
+[X,param,Ar,Ac,A1,A2,A3,Acolor]   = create_data(image_choice,choice_blur,param);
 [param.N,param.M,channel] = size(X);
 TAU = 1; %STEP_SIZE
 % TOTAL VARIATION %
