@@ -10,7 +10,7 @@ addpath HNO/
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CREATING DATA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 image_choice = 'JWST 256 gray';  % Image choice
 param.std    = 1e-2;           % Gaussian noise variance
-choice_blur  = 'Gauss small';  
+choice_blur  = 'Inpainting 50';  
 snr = [0]
 [X,param,Ar,Ac,A1,A2,A3,Acolor]   = create_data(image_choice,choice_blur,param);
 [param.N,param.M,channel] = size(X);

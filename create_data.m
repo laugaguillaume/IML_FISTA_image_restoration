@@ -29,8 +29,6 @@ switch choice_image
         x0 = 0 ; y0 = 0; tsize = 2048;
         r = [x0 y0 tsize tsize];
         X = imcrop(I1,r); X = double(X);
-        % Credits: SCIENCE: NASA, ESA, CSA, STScI 
-        % https://webbtelescope.org/contents/media/images/01GK2KKTR81SGYF24YBGYG7TAP.html
     case 'Jupiter 1024'
         I = im2double(imread('Jupiter_JWST.png')); targetSize = [1024 1024];
         r = centerCropWindow2d(size(I),targetSize);
