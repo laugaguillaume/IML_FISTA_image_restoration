@@ -18,4 +18,4 @@ Matlab may refuse to run functions of the TV toolbox and return an error message
  # Available images
  JWST deep field in sizes 256 x 256 x 3 to 2048 x 2048 x 3 + gray version in 256 x 256. Credits: IMAGE: NASA, ESA, CSA, STScI [Source](https://webbtelescope.org/contents/media/images/2022/035/01G7DCWB7137MYJ05CSH1Q5Z1Z)\
  Jupiter taken by JWST in size 1024 x 1024. Credits: NASA, ESA, CSA, Jupiter ERS Team; image processing by Judy Schmidt. [Source](https://blogs.nasa.gov/webb/2022/08/22/webbs-jupiter-images-showcase-auroras-hazes/)\
- Near IR image of Pillars of Creations in size 2048 x 2048. Credits: SCIENCE: NASA, ESA, CSA, STScI. [Source](https://webbtelescope.org/contents/media/images/01GK2KKTR81SGYF24YBGYG7TAP.html) \
+ Near IR image of Pillars of Creations in size 2048 x 2048. Credits: SCIENCE: NASA, ESA, CSA, STScI. [Source](https://webbtelescope.org/contents/media/images/01GK2KKTR81SGYF24YBGYG7TAP.html) 
