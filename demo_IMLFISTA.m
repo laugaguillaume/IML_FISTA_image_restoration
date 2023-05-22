@@ -258,7 +258,7 @@ figure(1)
 f = gcf;
 f.Units = 'normalized'
 f.InnerPosition = [0 0.0756 0.4528 0.4122];
-semilogy(time_steps(1:N+1),F_1f_normalized,'r-+','LineWidth',2.5,'MarkerSize',10)
+semilogy(time_steps_1f(1:N+1),F_1f_normalized,'r-+','LineWidth',2.5,'MarkerSize',10)
 hold on 
 semilogy(time_steps(1:N+1),F_normalized,'b-+','LineWidth',2.5,'MarkerSize',10)
 xlabel('CPU time (s)')
