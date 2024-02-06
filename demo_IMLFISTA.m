@@ -57,7 +57,7 @@ param.reg_type = [param_reg.reg,'_',param_reg.TVtype];
 prox = get_prox(param_reg.norm_type);
 param.dir_op       = @(x) D_op.dir_op(x);
 param.adj_op      = @(x) D_op.adj_op(x);
-param.functions.gh = @(U) param.lambda.*penalisation_cost(D_op.dir_op(U),param_reg.reg);%tlv(U,param.tlv_choice);
+param.functions.gh = @(U) param.lambda.*penalisation_cost(D_op.dir_op(U),param_reg.norm_type);%tlv(U,param.tlv_choice);
 param.proximal.proxgh = @(U,GAMMA,param_reg) denoising(U,param.lambda*GAMMA,D_op,prox,param_reg);
 param.proximal.proxg = @(U,GAMMA) prox(U,param.lambda.*GAMMA);
 % Config degradation functions/gradient of data fidelity term for optimization
@@ -225,7 +225,6 @@ for level = param.nb_level-1:-1:1
     end
     param.op.(levelopdirectH)       = @(U) D_opH.dir_op(U);
     param.op.(levelopadjointH)     = @(U) D_opH.adj_op(U);
-    
     param.functions.(levelgH) = @(U) lambda_reg.*penalisation_cost(U,param_reg.reg);
     param.proximal.(levelproxgH) = @(U,GAMMA) prox(U,lambda_reg.*GAMMA); % U is here in H,V format
 end
